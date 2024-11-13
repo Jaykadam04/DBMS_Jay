@@ -1,0 +1,40 @@
+select * from Employee;
+
+
+create or replace trigger salary_check
+before update on Employee
+for each row 
+begin
+    if :new.salary<:old.salary then 
+    raise_application_error(-20001,'Salary cannot be decreased ');
+    end if;
+end;    
+
+update Employee 
+set salary= 1000
+where emp_id=101;
+
+CREATE TABLE job_history (
+    employee_id NUMBER,
+    old_job_title VARCHAR2(50),
+    old_dept_id NUMBER,
+    start_date DATE,
+    end_date DATE
+);
+
+create or replace trigger job_title_check
+after update of job_title on Employee
+for each row 
+begin
+    if :new.job_title!=:old.job_title then 
+    insert into job_history values (:old.emp_id,:old.job_title,:old.dept_id,:old.doj,sysdate);
+    end if;
+end;
+
+UPDATE Employee
+SET job_title = 'Lead Developer'
+WHERE emp_id = 101;
+
+
+
+

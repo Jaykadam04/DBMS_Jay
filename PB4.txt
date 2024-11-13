@@ -1,0 +1,63 @@
+db.createCollection("Student_Data");
+
+db.Student_Data.insertMany([
+  { "Student_ID": 1, "Student_Name": "Alice", "Department": "Computer Science", "Marks": 85 },
+  { "Student_ID": 2, "Student_Name": "Bob", "Department": "Mathematics", "Marks": 90 },
+  { "Student_ID": 3, "Student_Name": "Charlie", "Department": "Physics", "Marks": 92 },
+  { "Student_ID": 4, "Student_Name": "David", "Department": "Computer Science", "Marks": 88 },
+  { "Student_ID": 5, "Student_Name": "Eve", "Department": "Mathematics", "Marks": 95 }
+]);
+
+print("Display all students along with average marks by department:");
+db.Student_Data.aggregate([
+  {
+    $group: {
+      _id: "$Department",
+      avgMarks: { $avg: "$Marks" },
+      students: { $push: { Student_Name: "$Student_Name", Marks: "$Marks" } }
+    }
+  }
+]).forEach(printjson);
+
+print("Display the number of students by department:");
+db.Student_Data.aggregate([
+  {
+    $group: {
+      _id: "$Department",
+      studentCount: { $sum: 1 }
+    }
+  }
+]).forEach(printjson);
+
+print("Display students with the highest marks in each department, sorted by marks:");
+db.Student_Data.aggregate([
+  {
+    $sort: { "Marks": -1 }
+  },
+  {
+    $group: {
+      _id: "$Department",
+      topStudent: { $first: "$Student_Name" },
+      highestMarks: { $first: "$Marks" }
+    }
+  },
+  {
+    $sort: { "highestMarks": -1 }
+  }
+]).forEach(printjson);
+
+print("Creating index on Student_ID...");
+db.Student_Data.createIndex({ "Student_ID": 1 });
+print("Index on Student_ID created.");
+
+print("Creating index on Student_Name and Department...");
+db.Student_Data.createIndex({ "Student_Name": 1, "Department": 1 });
+print("Index on Student_Name and Department created.");
+
+print("Dropping index on Student_ID...");
+db.Student_Data.dropIndex("Student_ID_1");
+print("Index on Student_ID dropped.");
+
+print("Dropping index on Student_Name and Department...");
+db.Student_Data.dropIndex("Student_Name_1_Department_1");
+print("Index on Student_Name and Department dropped.");

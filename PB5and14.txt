@@ -1,0 +1,94 @@
+-- Step 1: Create Tables
+
+-- Create Customer table
+CREATE TABLE Customer (
+    CustID INT PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(50),
+    Cust_Address VARCHAR(100),
+    Phone_no VARCHAR(15),
+    Age INT
+);
+
+-- Create Branch table
+CREATE TABLE Branch (
+    Branch_ID INT PRIMARY KEY AUTO_INCREMENT,
+    Branch_Name VARCHAR(50),
+    Address VARCHAR(100)
+);
+
+-- Create Account table with foreign keys referencing Customer and Branch tables
+CREATE TABLE Account (
+    Account_no INT PRIMARY KEY AUTO_INCREMENT,
+    Branch_ID INT,
+    CustID INT,
+    date_open DATE,
+    Account_type VARCHAR(20),
+    Balance DECIMAL(15, 2),
+    FOREIGN KEY (Branch_ID) REFERENCES Branch(Branch_ID),
+    FOREIGN KEY (CustID) REFERENCES Customer(CustID)
+);
+
+-- Step 2: Insert Sample Data into Tables
+
+-- Insert data into Customer table
+INSERT INTO Customer (Name, Cust_Address, Phone_no, Age) VALUES
+('Jay', 'Mumbai', '9876543210', 30),
+('Bhavesh', 'Delhi', '9876543211', 28),
+('Om', 'Bangalore', '9876543212', 35),
+('Harshal', 'Chennai', '9876543213', 40),
+('Gaurav', 'Kolkata', '9876543214', 32),
+('Kartika', 'Pune', '9876543215', 37);
+
+-- Insert data into Branch table
+INSERT INTO Branch (Branch_Name, Address) VALUES
+('Mumbai Branch', 'Mumbai'),
+('Delhi Branch', 'Delhi'),
+('Bangalore Branch', 'Bangalore'),
+('Chennai Branch', 'Chennai'),
+('Kolkata Branch', 'Kolkata');
+
+-- Insert data into Account table
+INSERT INTO Account (Branch_ID, CustID, date_open, Account_type, Balance) VALUES
+(1, 1, '2018-08-16', 'Saving Account', 5000.00),
+(2, 2, '2018-02-16', 'Loan Account', 15000.00),
+(3, 3, '2018-08-16', 'Saving Account', 8000.00),
+(4, 4, 4, '2018-02-16', 'Loan Account', 20000.00),
+(5, 5, 5, '2018-08-16', 'Saving Account', 12000.00),
+(1, 6, '2019-01-05', 'Saving Account', 7000.00);
+
+-- Step 3: Add the Column “Email_Address” in Customer Table
+ALTER TABLE Customer ADD COLUMN Email_Address VARCHAR(50);
+
+-- Step 4: Change the Name of Column “Email_Address” to “Email_ID” in Customer Table
+ALTER TABLE Customer CHANGE COLUMN Email_Address Email_ID VARCHAR(50);
+
+-- Step 5: Display the Customer Details with the Highest Balance in the Account
+SELECT C.*
+FROM Customer C
+JOIN Account A ON C.CustID = A.CustID
+ORDER BY A.Balance DESC
+LIMIT 1;
+
+-- Step 6: Display the Customer Details with the Lowest Balance for Account Type = “Saving Account”
+SELECT C.*
+FROM Customer C
+JOIN Account A ON C.CustID = A.CustID
+WHERE A.Account_type = 'Saving Account'
+ORDER BY A.Balance ASC
+LIMIT 1;
+
+-- Step 7: Display the Customer Details That Live in Pune and Have Age Greater Than 35
+SELECT *
+FROM Customer
+WHERE Cust_Address = 'Pune' AND Age > 35;
+
+-- Step 8: Display the CustID, Name, and Age of the Customer in Ascending Order of Their Age
+SELECT CustID, Name, Age
+FROM Customer
+ORDER BY Age ASC;
+
+-- Step 9: Display the Name and Branch_ID of the Customer Grouped by the Account_type
+SELECT C.Name, A.Branch_ID, A.Account_type
+FROM Customer C
+JOIN Account A ON C.CustID = A.CustID
+GROUP BY A.Account_type, C.Name, A.Branch_ID;

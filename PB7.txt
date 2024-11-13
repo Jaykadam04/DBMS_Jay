@@ -1,0 +1,80 @@
+// Create the Book collection and insert sample data
+db.createCollection("Book");
+
+db.Book.insertMany([
+  { "Title": "Book A", "Author_name": "Author 1", "Borrowed_status": true, "Price": 250 },
+  { "Title": "Book B", "Author_name": "Author 1", "Borrowed_status": false, "Price": 320 },
+  { "Title": "Book C", "Author_name": "Author 2", "Borrowed_status": true, "Price": 400 },
+  { "Title": "Book D", "Author_name": "Author 2", "Borrowed_status": true, "Price": 150 },
+  { "Title": "Book E", "Author_name": "Author 3", "Borrowed_status": false, "Price": 500 }
+]);
+
+// 1. Display Author-wise list of books
+var mapFunction1 = function() {
+  emit(this.Author_name, { books: [this.Title] });
+};
+
+var reduceFunction1 = function(key, values) {
+  let bookList = [];
+  values.forEach(function(value) {
+    bookList = bookList.concat(value.books);
+  });
+  return { books: bookList };
+};
+
+db.Book.mapReduce(
+  mapFunction1,
+  reduceFunction1,
+  { out: "Author_books" }
+);
+
+print("Author-wise list of books:");
+db.Author_books.find().forEach(printjson);
+
+// 2. Display Author-wise list of books having Borrowed_status as “True”
+var mapFunction2 = function() {
+  if (this.Borrowed_status === true) {
+    emit(this.Author_name, { books: [this.Title] });
+  }
+};
+
+var reduceFunction2 = function(key, values) {
+  let bookList = [];
+  values.forEach(function(value) {
+    bookList = bookList.concat(value.books);
+  });
+  return { books: bookList };
+};
+
+db.Book.mapReduce(
+  mapFunction2,
+  reduceFunction2,
+  { out: "Author_borrowed_books" }
+);
+
+print("Author-wise list of borrowed books:");
+db.Author_borrowed_books.find().forEach(printjson);
+
+// 3. Display Author-wise list of books having price greater than 300
+var mapFunction3 = function() {
+  if (this.Price > 300) {
+    emit(this.Author_name, { books: [this.Title] });
+  }
+};
+
+var reduceFunction3 = function(key, values) {
+  let bookList = [];
+  values.forEach(function(value) {
+    bookList = bookList.concat(value.books);
+  });
+  return { books: bookList };
+};
+
+db.Book.mapReduce(
+  mapFunction3,
+  reduceFunction3,
+  { out: "Author_expensive_books" }
+);
+
+print("Author-wise list of books with price greater than 300:");
+db.Author_expensive_books.find().forEach(printjson);

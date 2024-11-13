@@ -1,0 +1,86 @@
+// Create the Student collection and insert sample data
+db.createCollection("Student");
+
+db.Student.insertMany([
+  { "roll_no": 1, "name": "Alice", "class": "TE", "dept": "Computer Science", "aggregate_marks": 78 },
+  { "roll_no": 2, "name": "Bob", "class": "TE", "dept": "Mechanical", "aggregate_marks": 85 },
+  { "roll_no": 3, "name": "Charlie", "class": "TE", "dept": "Computer Science", "aggregate_marks": 90 },
+  { "roll_no": 4, "name": "David", "class": "SE", "dept": "Electrical", "aggregate_marks": 88 },
+  { "roll_no": 5, "name": "Eve", "class": "SE", "dept": "Mechanical", "aggregate_marks": 95 },
+  { "roll_no": 6, "name": "Frank", "class": "BE", "dept": "Computer Science", "aggregate_marks": 72 },
+  { "roll_no": 7, "name": "Grace", "class": "BE", "dept": "Electrical", "aggregate_marks": 80 },
+  { "roll_no": 8, "name": "Hannah", "class": "BE", "dept": "Mechanical", "aggregate_marks": 76 }
+]);
+
+// 1. Finding the total marks of students of “TE” class department-wise
+var mapFunction1 = function() {
+  if (this.class === "TE") {
+    emit(this.dept, this.aggregate_marks);
+  }
+};
+
+var reduceFunction1 = function(key, values) {
+  return Array.sum(values);
+};
+
+db.Student.mapReduce(
+  mapFunction1,
+  reduceFunction1,
+  { out: "TE_class_total_marks" }
+);
+
+print("Total marks of students in TE class department-wise:");
+db.TE_class_total_marks.find().forEach(printjson);
+
+// 2. Finding the highest marks of students of “SE” class department-wise
+var mapFunction2 = function() {
+  if (this.class === "SE") {
+    emit(this.dept, this.aggregate_marks);
+  }
+};
+
+var reduceFunction2 = function(key, values) {
+  return Math.max.apply(null, values);
+};
+
+db.Student.mapReduce(
+  mapFunction2,
+  reduceFunction2,
+  { out: "SE_class_highest_marks" }
+);
+
+print("Highest marks of students in SE class department-wise:");
+db.SE_class_highest_marks.find().forEach(printjson);
+
+// 3. Finding average marks of students of “BE” class department-wise
+var mapFunction3 = function() {
+  if (this.class === "BE") {
+    emit(this.dept, { totalMarks: this.aggregate_marks, count: 1 });
+  }
+};
+
+var reduceFunction3 = function(key, values) {
+  let totalMarks = 0;
+  let count = 0;
+  values.forEach(function(value) {
+    totalMarks += value.totalMarks;
+    count += value.count;
+  });
+  return { totalMarks: totalMarks, count: count };
+};
+
+var finalizeFunction3 = function(key, reducedValue) {
+  return reducedValue.totalMarks / reducedValue.count;
+};
+
+db.Student.mapReduce(
+  mapFunction3,
+  reduceFunction3,
+  {
+    out: "BE_class_average_marks",
+    finalize: finalizeFunction3
+  }
+);
+
+print("Average marks of students in BE class department-wise:");
+db.BE_class_average_marks.find().forEach(printjson);

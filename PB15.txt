@@ -1,0 +1,74 @@
+CREATE TABLE Products (
+    Product_id NUMBER PRIMARY KEY,
+    Product_Name VARCHAR2(50),
+    Product_Type VARCHAR2(20),
+    Price NUMBER
+);
+
+INSERT INTO Products (Product_id, Product_Name, Product_Type, Price) VALUES (1, 'T-Shirt', 'Apparel', 1500);
+INSERT INTO Products (Product_id, Product_Name, Product_Type, Price) VALUES (2, 'Jeans', 'Apparel', 3000);
+INSERT INTO Products (Product_id, Product_Name, Product_Type, Price) VALUES (3, 'Jacket', 'Apparel', 6000);
+INSERT INTO Products (Product_id, Product_Name, Product_Type, Price) VALUES (4, 'Sneakers', 'Footwear', 4500);
+INSERT INTO Products (Product_id, Product_Name, Product_Type, Price) VALUES (5, 'Laptop', 'Electronics', 55000);
+INSERT INTO Products (Product_id, Product_Name, Product_Type, Price) VALUES (6, 'Smartphone', 'Electronics', 35000);
+INSERT INTO Products (Product_id, Product_Name, Product_Type, Price) VALUES (7, 'Blender', 'Appliance', 4000);
+INSERT INTO Products (Product_id, Product_Name, Product_Type, Price) VALUES (8, 'Washing Machine', 'Appliance', 15000);
+INSERT INTO Products (Product_id, Product_Name, Product_Type, Price) VALUES (9, 'Formal Shirt', 'Apparel', 2500);
+INSERT INTO Products (Product_id, Product_Name, Product_Type, Price) VALUES (10, 'Dress', 'Apparel', 5500);
+
+DECLARE
+    CURSOR price_range_cursor(p_min_price NUMBER, p_max_price NUMBER) IS
+        SELECT Product_id, Product_Name, Product_Type, Price
+        FROM Products
+        WHERE Price BETWEEN p_min_price AND p_max_price
+        AND Product_Type = 'Apparel';
+
+    v_product_id Products.Product_id%TYPE;
+    v_product_name Products.Product_Name%TYPE;
+    v_product_type Products.Product_Type%TYPE;
+    v_price Products.Price%TYPE;
+    v_min_price NUMBER := &Enter_Min_Price;
+    v_max_price NUMBER := &Enter_Max_Price;
+BEGIN
+    OPEN price_range_cursor(v_min_price, v_max_price);
+    LOOP
+        FETCH price_range_cursor INTO v_product_id, v_product_name, v_product_type, v_price;
+        EXIT WHEN price_range_cursor%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE('ID: ' || v_product_id || ', Name: ' || v_product_name || 
+                             ', Type: ' || v_product_type || ', Price: ' || v_price);
+    END LOOP;
+    CLOSE price_range_cursor;
+END;
+/
+
+DECLARE
+    CURSOR high_price_cursor IS
+        SELECT Product_id, Product_Name, Product_Type, Price
+        FROM Products
+        WHERE Price > 5000;
+
+    v_product_id Products.Product_id%TYPE;
+    v_product_name Products.Product_Name%TYPE;
+    v_product_type Products.Product_Type%TYPE;
+    v_price Products.Price%TYPE;
+BEGIN
+    OPEN high_price_cursor;
+    LOOP
+        FETCH high_price_cursor INTO v_product_id, v_product_name, v_product_type, v_price;
+        EXIT WHEN high_price_cursor%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE('ID: ' || v_product_id || ', Name: ' || v_product_name || 
+                             ', Type: ' || v_product_type || ', Price: ' || v_price);
+    END LOOP;
+    CLOSE high_price_cursor;
+END;
+/
+
+DECLARE
+    v_rows_updated NUMBER;
+BEGIN
+    UPDATE Products
+    SET Price = Price + 1000;
+    v_rows_updated := SQL%ROWCOUNT;
+    DBMS_OUTPUT.PUT_LINE('Number of products with price incremented: ' || v_rows_updated);
+END;
+/

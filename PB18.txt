@@ -1,0 +1,60 @@
+create table Account(Account_No int,Cust_Name varchar2(20),Balance int,NoOfYears number);
+create table Earned_Interest(Account_No int ,Interest_Amt number);
+
+select * from Account;
+
+INSERT INTO Account (Account_No, Cust_Name, Balance, NoOfYears) VALUES (1001, 'Jay', 75000, 12);
+INSERT INTO Account (Account_No, Cust_Name, Balance, NoOfYears) VALUES (1002, 'OM', 40000, 8);
+INSERT INTO Account (Account_No, Cust_Name, Balance, NoOfYears) VALUES (1003, 'Bhavesh', 120000, 15);
+INSERT INTO Account (Account_No, Cust_Name, Balance, NoOfYears) VALUES (1004, 'Harshal', 25000, 3);
+INSERT INTO Account (Account_No, Cust_Name, Balance, NoOfYears) VALUES (1005, 'Gaurav', 90000, 5);
+
+create or replace procedure calc(p_acc_no in int, p_interest in int)
+is 
+v_balance number;
+v_calc_int number;
+v_years number;
+ begin 
+ 
+ select Balance,NoOfYears into v_balance,v_years from Account where Account_No = p_acc_no;
+ 
+ v_calc_int := (v_balance*v_years*p_interest)/100;
+ dbms_output.put_line('total interest = '||v_calc_int);
+ insert into Earned_Interest(Account_No,Interest_Amt)values(p_acc_no,v_calc_int);
+for rec in (select * from Earned_Interest) loop
+dbms_output.put_line('Account no '||rec.Account_No||'Interest Amount '||rec.Interest_Amt);
+end loop;
+
+ end calc;
+ 
+ set SERVEROUTPUT on;
+ begin
+  calc(p_acc_no => 1001, p_interest => 5);
+  end;
+create table Account(Account_No int,Cust_Name varchar2(20),Balance int,NoOfYears number);
+create table Earned_Interest(Account_No int ,Interest_Amt number);
+
+create or replace function get_balance_account
+return varchar2
+is 
+result_str varchar(10000);
+begin 
+result_str:= '';
+
+for rec in(select * from Account where Balance>50000)loop
+result_str:= result_str||'Account no '||rec.Account_No||'Customer Name'||rec.Cust_Name||'Balance '||rec.Balance||'No Of Years '||rec.NoOfYears||chr(10);
+end loop;
+
+return result_str;
+
+end get_balance_account;
+
+set SERVEROUTPUT ON;
+declare
+resultstr varchar2(20000);
+begin
+resultstr := get_balance_account;
+dbms_output.put_line(resultstr);
+end;
+
+

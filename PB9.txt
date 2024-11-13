@@ -1,0 +1,52 @@
+
+set SERVEROUTPUT ON;
+declare 
+cursor empcursor is 
+select emp_id,emp_name,salary from Employee where salary>5000;
+
+v_emp_name varchar2(30);
+v_emp_id number;
+v_salary number;
+
+begin 
+
+open empcursor;
+loop 
+fetch empcursor into v_emp_id,v_emp_name,v_salary;
+exit when empcursor%notfound ;
+DBMS_OUTPUT.PUT_LINE('Employee ID '||v_emp_id||' Employee Name '||v_emp_name||' Employee Salary '||v_salary);
+end loop;
+close empcursor;
+end;
+
+set SERVEROUTPUT ON;
+declare 
+v_no number;
+begin
+select count(emp_id) into v_no from Employee;
+DBMS_OUTPUT.PUT_LINE(v_no);
+end;
+
+
+set SERVEROUTPUT ON;
+declare
+
+cursor salaryc(p_emp_id number) is
+select Salary from Employee where emp_id = p_emp_id;
+v_emp_id number;
+v_salary number;
+begin 
+v_emp_id:=&Enter_emp_id;
+open salaryc(v_emp_id);
+
+fetch salaryc into v_salary;
+if salaryc%found then
+DBMS_OUTPUT.PUT_LINE(v_salary);
+else
+DBMS_OUTPUT.PUT_LINE('Employee not found');
+end if;
+close salaryc;
+end;
+
+
+

@@ -1,0 +1,53 @@
+db.createCollection("Movies_Data");
+
+db.Movies_Data.insertMany([
+  { "Movie_ID": 1, "Movie_Name": "Inception", "Director": "Christopher Nolan", "Genre": "Sci-Fi", "BoxOfficeCollection": 829895144 },
+  { "Movie_ID": 2, "Movie_Name": "The Dark Knight", "Director": "Christopher Nolan", "Genre": "Action", "BoxOfficeCollection": 1004558444 },
+  { "Movie_ID": 3, "Movie_Name": "Titanic", "Director": "James Cameron", "Genre": "Romance", "BoxOfficeCollection": 2187463944 },
+  { "Movie_ID": 4, "Movie_Name": "Avatar", "Director": "James Cameron", "Genre": "Sci-Fi", "BoxOfficeCollection": 2787965087 },
+  { "Movie_ID": 5, "Movie_Name": "Interstellar", "Director": "Christopher Nolan", "Genre": "Sci-Fi", "BoxOfficeCollection": 677471339 }
+]);
+
+print("Movies directed by each Director:");
+db.Movies_Data.aggregate([
+  { $group: { _id: "$Director", count: { $sum: 1 } } }
+]).forEach(printjson);
+
+print("Movies with the highest BoxOfficeCollection in each Genre:");
+db.Movies_Data.aggregate([
+  {
+    $group: {
+      _id: "$Genre",
+      maxCollection: { $max: "$BoxOfficeCollection" },
+      movie: { $first: "$Movie_Name" }
+    }
+  }
+]).forEach(printjson);
+
+print("Movies with the highest BoxOfficeCollection in each Genre, sorted by BoxOfficeCollection:");
+db.Movies_Data.aggregate([
+  {
+    $group: {
+      _id: "$Genre",
+      maxCollection: { $max: "$BoxOfficeCollection" },
+      movie: { $first: "$Movie_Name" }
+    }
+  },
+  { $sort: { maxCollection: 1 } }
+]).forEach(printjson);
+
+print("Creating index on Movie_ID...");
+db.Movies_Data.createIndex({ "Movie_ID": 1 });
+print("Index on Movie_ID created.");
+
+print("Creating index on Movie_Name and Director...");
+db.Movies_Data.createIndex({ "Movie_Name": 1, "Director": 1 });
+print("Index on Movie_Name and Director created.");
+
+print("Dropping index on Movie_ID...");
+db.Movies_Data.dropIndex("Movie_ID_1");
+print("Index on Movie_ID dropped.");
+
+print("Dropping index on Movie_Name and Director...");
+db.Movies_Data.dropIndex("Movie_Name_1_Director_1");
+print("Index on Movie_Name and Director dropped.");

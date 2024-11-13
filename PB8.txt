@@ -1,0 +1,78 @@
+CREATE TABLE Employee (
+    Employee_id INT PRIMARY KEY,
+    First_name VARCHAR(50),
+    Last_name VARCHAR(50),
+    Hire_date DATE,
+    Salary DECIMAL(15, 2),
+    Job_title VARCHAR(50),
+    Manager_id INT,
+    Department_id INT,
+    FOREIGN KEY (Manager_id) REFERENCES Manager(Manager_id),
+    FOREIGN KEY (Department_id) REFERENCES Departments(Department_id)
+);
+
+CREATE TABLE Departments (
+    Department_id INT PRIMARY KEY,
+    Department_name VARCHAR(50),
+    Manager_id INT,
+    Location_id INT,
+    FOREIGN KEY (Manager_id) REFERENCES Manager(Manager_id),
+    FOREIGN KEY (Location_id) REFERENCES Locations(location_id)
+);
+
+CREATE TABLE Locations (
+    Location_id INT PRIMARY KEY,
+    Street_address VARCHAR(100),
+    Postal_code VARCHAR(10),
+    City VARCHAR(50),
+    State VARCHAR(50),
+    Country_id VARCHAR(2)
+);
+
+CREATE TABLE Manager (
+    Manager_id INT PRIMARY KEY,
+    Manager_name VARCHAR(50)
+);
+
+INSERT INTO Manager (Manager_id, Manager_name) VALUES
+(1, 'Smith'), (2, 'Johnson'), (3, 'Williams');
+
+INSERT INTO Locations (Location_id, Street_address, Postal_code, City, State, Country_id) VALUES
+(1, '123 Maple St', '90210', 'Los Angeles', 'CA', 'US'),
+(2, '456 Oak St', '10001', 'New York', 'NY', 'US'),
+(3, '789 Pine St', '94103', 'San Francisco', 'CA', 'US');
+
+INSERT INTO Departments (Department_id, Department_name, Manager_id, Location_id) VALUES
+(10, 'Sales', 1, 1),
+(20, 'Marketing', 2, 2),
+(30, 'IT', 3, 3);
+
+INSERT INTO Employee (Employee_id, First_name, Last_name, Hire_date, Salary, Job_title, Manager_id, Department_id) VALUES
+(100, 'Jay', 'Singh', '2021-01-15', 70000, 'Sales Rep', 1, 10),
+(101, 'Bhavesh', 'Patel', '2022-02-20', 80000, 'Marketing Specialist', 2, 20),
+(102, 'Om', 'Kumar', '2021-07-10', 60000, 'IT Analyst', 3, 30),
+(103, 'Harshal', 'Jones', '2021-06-05', 75000, 'Sales Rep', 1, 10),
+(104, 'Gaurav', 'Desai', '2021-03-25', 85000, 'Manager', NULL, 10),
+(105, 'Kartika', 'Sharma', '2020-04-18', 90000, 'Marketing Lead', 2, 20);
+
+SELECT E.First_name, E.Last_name, E.Salary
+FROM Employee E
+WHERE E.Salary > (SELECT Salary FROM Employee WHERE Last_name = 'Singh');
+
+SELECT E.First_name, E.Last_name
+FROM Employee E
+JOIN Departments D ON E.Department_id = D.Department_id
+JOIN Locations L ON D.Location_id = L.Location_id
+WHERE E.Manager_id IS NOT NULL AND L.Country_id = 'US';
+
+SELECT E.First_name, E.Last_name, E.Salary
+FROM Employee E
+WHERE E.Salary > (SELECT AVG(Salary) FROM Employee);
+
+SELECT E.Employee_id, E.Last_name AS Employee_Name, E.Manager_id, M.Manager_name AS Manager_Name
+FROM Employee E
+JOIN Manager M ON E.Manager_id = M.Manager_id;
+
+SELECT E.First_name, E.Last_name, E.Hire_date
+FROM Employee E
+WHERE E.Hire_date > (SELECT Hire_date FROM Employee WHERE Last_name = 'Jones');

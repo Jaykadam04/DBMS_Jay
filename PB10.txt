@@ -1,0 +1,39 @@
+db.createCollection("Social_Media");
+
+db.Social_Media.insertMany([
+  { User_Id: 1, User_Name: "Jay", No_of_Posts: 120, No_of_Friends: 6, Friends_List: ["Om", "Bhavesh", "Harshal", "Gaurav", "Kartika", "Soham"], Interests: ["Music", "Travel"] },
+  { User_Id: 2, User_Name: "Om", No_of_Posts: 80, No_of_Friends: 3, Friends_List: ["Jay", "Bhavesh", "Harshal"], Interests: ["Cooking", "Sports"] },
+  { User_Id: 3, User_Name: "Bhavesh", No_of_Posts: 150, No_of_Friends: 7, Friends_List: ["Jay", "Om", "Gaurav", "Kartika", "Soham", "Janhavi", "Devendra"], Interests: ["Reading", "Writing"] },
+  { User_Id: 4, User_Name: "Harshal", No_of_Posts: 50, No_of_Friends: 2, Friends_List: ["Jay", "Om"], Interests: ["Photography", "Gaming"] },
+  { User_Id: 5, User_Name: "Gaurav", No_of_Posts: 130, No_of_Friends: 5, Friends_List: ["Jay", "Bhavesh", "Kartika", "Soham", "Devendra"], Interests: ["Fitness", "Music"] },
+  { User_Id: 6, User_Name: "Kartika", No_of_Posts: 60, No_of_Friends: 4, Friends_List: ["Jay", "Bhavesh", "Gaurav", "Janhavi"], Interests: ["Movies", "Hiking"] },
+  { User_Id: 7, User_Name: "Soham", No_of_Posts: 200, No_of_Friends: 8, Friends_List: ["Jay", "Bhavesh", "Gaurav", "Kartika", "Janhavi", "Devendra", "Saurabh", "Om"], Interests: ["Music", "Dance"] },
+  { User_Id: 8, User_Name: "Janhavi", No_of_Posts: 40, No_of_Friends: 3, Friends_List: ["Kartika", "Soham", "Saurabh"], Interests: ["Fashion", "Art"] },
+  { User_Id: 9, User_Name: "Devendra", No_of_Posts: 90, No_of_Friends: 5, Friends_List: ["Jay", "Bhavesh", "Soham", "Saurabh", "Om"], Interests: ["Travel", "Photography"] },
+  { User_Id: 10, User_Name: "Saurabh", No_of_Posts: 110, No_of_Friends: 6, Friends_List: ["Soham", "Devendra", "Janhavi", "Kartika", "Om", "Gaurav"], Interests: ["Writing", "Music"] },
+  { User_Id: 11, User_Name: "Rohit", No_of_Posts: 70, No_of_Friends: 4, Friends_List: ["Soham", "Janhavi", "Devendra", "Kartika"], Interests: ["Gaming", "Sports"] },
+  { User_Id: 12, User_Name: "Nikhil", No_of_Posts: 95, No_of_Friends: 3, Friends_List: ["Om", "Saurabh", "Janhavi"], Interests: ["Art", "Crafting"] },
+  { User_Id: 13, User_Name: "Neha", No_of_Posts: 60, No_of_Friends: 2, Friends_List: ["Devendra", "Saurabh"], Interests: ["Fitness", "Movies"] },
+  { User_Id: 14, User_Name: "Aditya", No_of_Posts: 40, No_of_Friends: 1, Friends_List: ["Jay"], Interests: ["Writing"] },
+  { User_Id: 15, User_Name: "Aarti", No_of_Posts: 175, No_of_Friends: 7, Friends_List: ["Soham", "Janhavi", "Devendra", "Saurabh", "Om", "Bhavesh", "Gaurav"], Interests: ["Cooking", "Travel"] },
+  { User_Id: 16, User_Name: "Pooja", No_of_Posts: 115, No_of_Friends: 6, Friends_List: ["Jay", "Saurabh", "Om", "Harshal", "Neha", "Bhavesh"], Interests: ["Reading", "Movies"] },
+  { User_Id: 17, User_Name: "Rahul", No_of_Posts: 125, No_of_Friends: 8, Friends_List: ["Aarti", "Jay", "Gaurav", "Soham", "Janhavi", "Devendra", "Saurabh", "Neha"], Interests: ["Fitness", "Cooking"] },
+  { User_Id: 18, User_Name: "Kiran", No_of_Posts: 90, No_of_Friends: 3, Friends_List: ["Aditya", "Pooja", "Neha"], Interests: ["Dance", "Travel"] },
+  { User_Id: 19, User_Name: "Amit", No_of_Posts: 45, No_of_Friends: 2, Friends_List: ["Pooja", "Om"], Interests: ["Photography", "Gaming"] },
+  { User_Id: 20, User_Name: "Sneha", No_of_Posts: 180, No_of_Friends: 5, Friends_List: ["Rohit", "Neha", "Kiran", "Aarti", "Pooja"], Interests: ["Fashion", "Art"] }
+]);
+
+print("List of all users in formatted manner:");
+db.Social_Media.find({}, { _id: 0 }).forEach(printjson);
+
+print("Users with number of posts greater than 100:");
+db.Social_Media.find({ No_of_Posts: { $gt: 100 } }, { _id: 0, User_Name: 1, No_of_Posts: 1 }).forEach(printjson);
+
+print("User names and their respective Friends_List:");
+db.Social_Media.find({}, { _id: 0, User_Name: 1, Friends_List: 1 }).forEach(printjson);
+
+print("User IDs and Friends_List of users with more than 5 friends:");
+db.Social_Media.find({ No_of_Friends: { $gt: 5 } }, { _id: 0, User_Id: 1, Friends_List: 1 }).forEach(printjson);
+
+print("All users with number of posts in descending order:");
+db.Social_Media.find({}, { _id: 0, User_Name: 1, No_of_Posts: 1 }).sort({ No_of_Posts: -1 }).forEach(printjson);

@@ -1,0 +1,42 @@
+create table Employee(emp_id int primary key,dept_id int,emp_name varchar2(20),doj date,salary int);
+create table Salary_Increment(emp_id int, new_salary int);
+
+insert into Employee(emp_id,dept_id,emp_name,doj,salary)values(101,1,'jay','13-02-22',20000);
+
+set serveroutput on;
+declare 
+v_emp_id number;
+v_doj date;
+v_salary number;
+v_incre_salary number;
+v_new_salary number;
+v_experience number;
+
+begin
+v_emp_id :=&Enter_Emp_id;
+
+select salary,doj into 
+v_salary,v_doj from Employee
+where emp_id = v_emp_id;
+
+v_experience:= trunc(months_between(sysdate,v_doj)/12);
+
+if v_experience > 10 then 
+v_incre_salary := v_salary*0.20;
+elsif v_experience > 5 then
+v_incre_salary := v_salary*0.10;
+else 
+v_incre_salary := v_salary*0.05;
+end if;
+
+v_new_salary :=v_salary+v_incre_salary;
+
+insert into Salary_Increment (emp_id, new_salary)values(v_emp_id,v_new_salary);
+
+exception 
+ when no_data_found then
+ dbms_output.put_line('No employee found with ID: ' || v_emp_id);
+
+ WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('An unexpected error occurred: ' || SQLERRM);
+END;

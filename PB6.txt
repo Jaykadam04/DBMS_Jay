@@ -1,0 +1,52 @@
+create table Employee(emp_id int primary key,dept_id int,emp_name varchar2(30),DoJ date,salary int,commission number,job_title varchar2(20));
+
+create or replace procedure employee_commission(p_emp_id in int)
+is 
+v_salary number;
+v_commission number;
+v_experience number;
+v_doj date;
+
+begin
+select salary,DoJ into v_salary,v_doj from Employee where emp_id=p_emp_id;
+v_experience := trunc(months_between(sysdate,v_doj));
+
+
+if v_salary>10000 then 
+v_commission:=v_salary*0.004;
+elsif v_salary<10000 and v_experience>10 then
+v_commission:=v_salary*0.0035;
+elsif v_salary<3000 then
+v_commission:=v_salary*0.0025;
+else
+v_commission:=v_salary*0.0015;
+end if;
+
+update Employee
+set commission = v_commission
+where emp_id = p_emp_id;
+
+end;
+
+begin 
+employee_commission(101);
+end;
+
+create or replace function manager_name(p_dept_id in int)
+return varchar2
+is 
+v_manager_name varchar2(30);
+
+begin 
+select emp_name into v_manager_name from Employee where dept_id=p_dept_id and job_title='manager';
+
+return v_manager_name;
+end manager_name;
+
+
+declare
+managger_name varchar2(50);
+begin 
+managger_name:= manager_name(6);
+dbms_output.put_line('Manager name is '||managger_name);
+end;
